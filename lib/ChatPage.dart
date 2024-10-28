@@ -77,8 +77,8 @@ class _ChatPageState extends State<ChatPage> {
         title: isConnecting
             ? Text('Connecting to $serverName...')
             : isConnected
-            ? Text('Connected to $serverName')
-            : Text('Chat Log with $serverName'),
+                ? Text('Connected to $serverName')
+                : Text('Chat Log with $serverName'),
       ),
       body: SafeArea(
         child: Column(
@@ -93,7 +93,10 @@ class _ChatPageState extends State<ChatPage> {
                   return ListTile(
                     title: Text(
                       ">${message.text}",
-                      style: TextStyle(color: message.whom == clientID ? Colors.blue : Colors.red),
+                      style: TextStyle(
+                          color: message.whom == clientID
+                              ? Colors.blue
+                              : Colors.red),
                     ),
                   );
                 },
@@ -107,7 +110,9 @@ class _ChatPageState extends State<ChatPage> {
                     child: TextField(
                       controller: textEditingController,
                       decoration: InputDecoration.collapsed(
-                        hintText: isConnected ? 'Type your message...' : 'Chat got disconnected',
+                        hintText: isConnected
+                            ? 'Type your message...'
+                            : 'Chat got disconnected',
                       ),
                       enabled: isConnected,
                     ),
@@ -115,7 +120,9 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 IconButton(
                   icon: Icon(Icons.send),
-                  onPressed: isConnected ? () => _sendMessage(textEditingController.text) : null,
+                  onPressed: isConnected
+                      ? () => _sendMessage(textEditingController.text)
+                      : null,
                 ),
               ],
             ),
@@ -125,9 +132,36 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  void _onDataReceived(Uint8List data) {
-    // Process data received here
-  }
+  String _buffer = ''; // Buffer to store incomplete messages
+
+      void _onDataReceived(Uint8List data) {
+        // Append new data to buffer
+        _buffer += utf8.decode(data);
+
+        // Process complete words by splitting at spaces or newline
+        List<String> words = _buffer.split(RegExp(r'[ \n]'));
+
+        // Keep the last element in the buffer if it's incomplete
+        _buffer = words.removeLast();
+
+        // Add each complete word to the messages list
+        for (var word in words) {
+          if (word.isNotEmpty) {
+            setState(() {
+              this.messages.add(_Message(1, word.trim()));
+            });
+
+            // Scroll to the latest message
+            Future.delayed(Duration(milliseconds: 333)).then((_) {
+              listScrollController.animateTo(
+                listScrollController.position.maxScrollExtent,
+                duration: Duration(milliseconds: 333),
+                curve: Curves.easeOut,
+              );
+            });
+          }
+        }
+      }
 
   void _sendMessage(String text) async {
     text = text.trim();
@@ -140,7 +174,10 @@ class _ChatPageState extends State<ChatPage> {
           messages.add(_Message(clientID, text));
         });
         Future.delayed(Duration(milliseconds: 333)).then((_) {
-          listScrollController.animateTo(listScrollController.position.maxScrollExtent, duration: Duration(milliseconds: 333), curve: Curves.easeOut);
+          listScrollController.animateTo(
+              listScrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 333),
+              curve: Curves.easeOut);
         });
       } catch (e) {
         // Handle error

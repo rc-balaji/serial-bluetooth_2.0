@@ -16,12 +16,17 @@ class HomePage extends StatelessWidget {
           title: Text('BLE Terminal'),
           actions: [
             IconButton(
-              icon: Icon(globalState.isConnected ? Icons.bluetooth_connected : Icons.bluetooth_disabled),
+              icon: Icon(globalState.isConnected
+                  ? Icons.bluetooth_connected
+                  : Icons.bluetooth_disabled),
               onPressed: () {
                 if (!globalState.isConnected) {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => DeviceConnectionPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DeviceConnectionPage()));
                 } else {
-                  globalState.setBluetoothConnection(false, '', '', '',null);
+                  globalState.setBluetoothConnection(false, '', '', '', null);
                 }
               },
             ),
@@ -34,12 +39,16 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: globalState.isConnected
                   ? Column(
-                children: [
-                  Text("Connected to: ${globalState.deviceName}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text("MAC Address: ${globalState.deviceAddress}", style: TextStyle(fontSize: 16)),
-                ],
-              )
-                  : Text("Please connect to the device.", style: TextStyle(fontSize: 20)),
+                      children: [
+                        Text("Connected to: ${globalState.deviceName}",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        Text("MAC Address: ${globalState.deviceAddress}",
+                            style: TextStyle(fontSize: 16)),
+                      ],
+                    )
+                  : Text("Please connect to the device.",
+                      style: TextStyle(fontSize: 20)),
             ),
             Expanded(
               child: globalState.isConnected
